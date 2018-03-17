@@ -36,10 +36,21 @@ public class NewsItem implements Serializable {
             return null;
         }
         NewsItem newsItem = new NewsItem();
-        newsItem.title = jsonObject.optString("title");
-        newsItem.content = jsonObject.optString("description");
-        newsItem.url = jsonObject.optString("url", null);
-        newsItem.imageUrl = jsonObject.optString("urlToImage", null);
+        if(!jsonObject.isNull("title")) {
+            newsItem.title = jsonObject.optString("title");
+        }
+        if(!jsonObject.isNull("description")) {
+            newsItem.content = jsonObject.optString("description");
+        }
+        if(!jsonObject.isNull("url")) {
+            newsItem.url = jsonObject.optString("url", null);
+        }
+        if(!jsonObject.isNull("urlToImage")) {
+            newsItem.imageUrl = jsonObject.optString("urlToImage", null);
+            if (newsItem.imageUrl.startsWith("//")) {
+                newsItem.imageUrl = "http:" + newsItem.imageUrl;
+            }
+        }
         try{
             String publishedAt = jsonObject.optString("publishedAt", null);
             if(publishedAt != null){

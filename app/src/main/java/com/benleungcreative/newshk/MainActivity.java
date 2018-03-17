@@ -9,6 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.benleungcreative.newshk.Classes.NewsCategory;
 import com.benleungcreative.newshk.NewsList.NewsListFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,7 +37,23 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return new NewsListFragment();
+            switch (position) {
+                case 0:
+                    return NewsListFragment.newInstance(NewsCategory.TOP_CATEGORY);
+                case 1:
+                    return NewsListFragment.newInstance(NewsCategory.BUSINESS);
+                case 2:
+                    return NewsListFragment.newInstance(NewsCategory.ENTERTAINMENT);
+                case 3:
+                    return NewsListFragment.newInstance(NewsCategory.HEALTH);
+                case 4:
+                    return NewsListFragment.newInstance(NewsCategory.SCIENCE);
+                case 5:
+                    return NewsListFragment.newInstance(NewsCategory.SPORTS);
+                case 6:
+                    return NewsListFragment.newInstance(NewsCategory.TECHNOLOGY);
+            }
+            return null;
         }
 
         @Override
