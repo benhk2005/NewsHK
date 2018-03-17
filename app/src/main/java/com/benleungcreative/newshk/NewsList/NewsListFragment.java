@@ -34,7 +34,7 @@ public class NewsListFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(loadingContainer != null){
+        if (loadingContainer != null) {
             outState.putBoolean(EXTRA_LOADING_CONTAINER_VISIBLE, loadingContainer.getVisibility() == View.VISIBLE);
         }
     }
@@ -50,8 +50,8 @@ public class NewsListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         newsListRecyclerView = view.findViewById(R.id.newsListRecyclerView);
         loadingContainer = view.findViewById(R.id.loadingContainer);
-        if(savedInstanceState != null){
-            loadingContainer.setVisibility(savedInstanceState.getBoolean(EXTRA_LOADING_CONTAINER_VISIBLE,true)?View.VISIBLE:View.GONE);
+        if (savedInstanceState != null) {
+            loadingContainer.setVisibility(savedInstanceState.getBoolean(EXTRA_LOADING_CONTAINER_VISIBLE, true) ? View.VISIBLE : View.GONE);
         }
     }
 
