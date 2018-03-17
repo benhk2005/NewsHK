@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         mainTabLayout.setupWithViewPager(mainViewPager, false);
     }
 
-    private class NewsListFragmentAdapter extends FragmentStatePagerAdapter{
+    private class NewsListFragmentAdapter extends FragmentStatePagerAdapter {
 
         private NewsListFragmentAdapter(FragmentManager fm) {
             super(fm);
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            switch(position){
+            switch (position) {
                 case 0:
                     return getString(R.string.tab_top_headlines);
                 case 1:
