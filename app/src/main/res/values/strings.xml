@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">NewsHK</string>
+
+    <string name="tab_top_headlines">Top Headlines</string>
+    <string name="tab_business">Business</string>
+    <string name="tab_entertainment">Entertainment</string>
+    <string name="tab_health">Health</string>
+    <string name="tab_science">Science</string>
+    <string name="tab_sports">Sports</string>
+    <string name="tab_technology">Technology</string>
 </resources>
