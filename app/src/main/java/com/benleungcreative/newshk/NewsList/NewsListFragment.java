@@ -6,13 +6,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.benleungcreative.newshk.Classes.MyRequest;
@@ -36,7 +37,6 @@ import java.util.ArrayList;
  */
 public class NewsListFragment extends Fragment {
 
-    private static final String EXTRA_LOADING_CONTAINER_VISIBLE = "EXTRA_LOADING_CONTAINER_VISIBLE";
     private static final String EXTRA_NEWS_CATEGORY = "EXTRA_NEWS_CATEGORY";
     private static final String EXTRA_NEWS_ITEM_ARRAY_LIST = "EXTRA_NEWS_ITEM_ARRAY_LIST";
 
@@ -49,9 +49,9 @@ public class NewsListFragment extends Fragment {
 //    private static final String API_CATEGORY_TECHNOLOGY = "technology";
 
     private RecyclerView newsListRecyclerView;
-    private RelativeLayout loadingContainer;
     private NewsCategory newsCategory;
     private ArrayList<NewsItem> newsItemArrayList;
+    private SwipeRefreshLayout newsListPullToRefreshLayout;
 
     public NewsListFragment() {
     }
@@ -80,10 +80,7 @@ public class NewsListFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (loadingContainer != null) {
-            outState.putBoolean(EXTRA_LOADING_CONTAINER_VISIBLE, loadingContainer.getVisibility() == View.VISIBLE);
-            outState.putSerializable(EXTRA_NEWS_ITEM_ARRAY_LIST, newsItemArrayList);
-        }
+        outState.putSerializable(EXTRA_NEWS_ITEM_ARRAY_LIST, newsItemArrayList);
     }
 
     @Override
@@ -95,16 +92,21 @@ public class NewsListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        newsListPullToRefreshLayout = view.findViewById(R.id.newsListPullToRefreshLayout);
+        newsListPullToRefreshLayout.setColorSchemeColors(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null));
         newsListRecyclerView = view.findViewById(R.id.newsListRecyclerView);
         newsListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         newsListRecyclerView.setAdapter(new NewsListAdapter());
-        loadingContainer = view.findViewById(R.id.loadingContainer);
-        if (savedInstanceState != null) {
-            loadingContainer.setVisibility(savedInstanceState.getBoolean(EXTRA_LOADING_CONTAINER_VISIBLE, true) ? View.VISIBLE : View.GONE);
-        } else {
+        if (savedInstanceState == null) {
             showLoadingUI();
             getNewsFromAPI();
         }
+        newsListPullToRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getNewsFromAPI();
+            }
+        });
     }
 
     private void getNewsFromAPI() {
@@ -126,11 +128,13 @@ public class NewsListFragment extends Fragment {
                     updateRecyclerView();
                     hideLoadingUI();
                 }
+                newsListPullToRefreshLayout.setRefreshing(false);
             }
 
             @Override
             public void onFail(Exception e) {
                 e.printStackTrace();
+                newsListPullToRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -145,15 +149,11 @@ public class NewsListFragment extends Fragment {
     }
 
     private void showLoadingUI() {
-        if (loadingContainer != null) {
-            loadingContainer.setVisibility(View.VISIBLE);
-        }
+        newsListPullToRefreshLayout.setRefreshing(true);
     }
 
     private void hideLoadingUI() {
-        if (loadingContainer != null) {
-            loadingContainer.setVisibility(View.GONE);
-        }
+        newsListPullToRefreshLayout.setRefreshing(false);
     }
 
     private class NewsListAdapter extends RecyclerView.Adapter<NewsItemViewHolder> {
@@ -208,7 +208,6 @@ public class NewsListFragment extends Fragment {
                             }
 
 
-
                             @Override
                             public void onLoadFailed(@Nullable Drawable errorDrawable) {
                                 super.onLoadFailed(errorDrawable);
@@ -220,15 +219,15 @@ public class NewsListFragment extends Fragment {
                 newsItemImageView.setImageResource(R.drawable.splash_screen_background_drawable);
                 newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
             }
-            if(newsItem.title == null){
+            if (newsItem.title == null) {
                 newsTitleTextView.setVisibility(View.GONE);
-            }else{
+            } else {
                 newsTitleTextView.setVisibility(View.VISIBLE);
                 newsTitleTextView.setText(newsItem.title);
             }
-            if(newsItem.content == null){
+            if (newsItem.content == null) {
                 newsContentTextView.setVisibility(View.GONE);
-            }else{
+            } else {
                 newsTitleTextView.setVisibility(View.VISIBLE);
                 newsContentTextView.setText(newsItem.content);
             }
