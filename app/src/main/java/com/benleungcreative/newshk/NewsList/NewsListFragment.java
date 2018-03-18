@@ -80,6 +80,7 @@ public class NewsListFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putSerializable(EXTRA_NEWS_CATEGORY, newsCategory);
         outState.putSerializable(EXTRA_NEWS_ITEM_ARRAY_LIST, newsItemArrayList);
     }
 
