@@ -2,7 +2,6 @@ package com.benleungcreative.newshk.NewsDetail;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ShareCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -81,12 +80,28 @@ public class NewsDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void shareNewsItem(){
-        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
-                .setText(newsItem.content)
-                .setType("text/plain")
-                .createChooserIntent();
-        startActivity(shareIntent);
+    private void shareNewsItem() {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        if (newsItem.title != null && !newsItem.title.isEmpty()) {
+            intent.putExtra(Intent.EXTRA_TITLE, newsItem.title);
+        }
+        intent.putExtra(Intent.EXTRA_TEXT, prepareShareText());
+        startActivity(Intent.createChooser(intent, null));
+    }
+
+    private String prepareShareText() {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (newsItem.title != null && !newsItem.title.isEmpty()) {
+            stringBuilder.append(newsItem.title + "\n");
+        }
+        if (newsItem.content != null && !newsItem.content.isEmpty()) {
+            stringBuilder.append(newsItem.content + "\n");
+        }
+        if (newsItem.url != null && !newsItem.url.isEmpty()) {
+            stringBuilder.append(newsItem.url);
+        }
+        return stringBuilder.toString();
     }
 
     @Override
