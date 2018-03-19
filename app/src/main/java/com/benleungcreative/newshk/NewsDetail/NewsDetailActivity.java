@@ -13,19 +13,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.benleungcreative.newshk.Classes.NewsCategory;
 import com.benleungcreative.newshk.Classes.NewsItem;
 import com.benleungcreative.newshk.Helpers.OfflineNewsHelper;
 import com.benleungcreative.newshk.R;
 import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 public class NewsDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_NEWS_ITEM = "EXTRA_NEWS_ITEM";
+    public static final String EXTRA_NEWS_CATEGORY = "EXTRA_NEWS_CATEGORY";
 
     private NewsItem newsItem;
+    private NewsCategory newsCategory;
     private Toolbar newsDetailToolbar;
     private TextView newsDetailTitle;
     private TextView newsDetailSourceName;
@@ -43,8 +47,10 @@ public class NewsDetailActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             Intent intent = getIntent();
             newsItem = (NewsItem) intent.getSerializableExtra(EXTRA_NEWS_ITEM);
+            newsCategory = (NewsCategory) intent.getSerializableExtra(EXTRA_NEWS_CATEGORY);
         } else {
             newsItem = (NewsItem) savedInstanceState.getSerializable(EXTRA_NEWS_ITEM);
+            newsCategory = (NewsCategory) savedInstanceState.getSerializable(EXTRA_NEWS_CATEGORY);
         }
         if (newsItem == null) {
             finish();
@@ -65,11 +71,15 @@ public class NewsDetailActivity extends AppCompatActivity {
         newsDetailTitle.setText(newsItem.title);
         newsDateTime.setText(simpleDateFormat.format(newsItem.publishedAt));
         newsDetailContent.setText(newsItem.content);
-        if (newsItem.imageUrl != null && !newsItem.imageUrl.isEmpty()) {
-            newsDetailImageView.setVisibility(View.VISIBLE);
-            Glide.with(this).load(newsItem.imageUrl).into(newsDetailImageView);
-        } else {
-            newsDetailImageView.setVisibility(View.GONE);
+        if(newsCategory == NewsCategory.OFFLINE_NEWS){
+            Glide.with(this).load(new File(getFilesDir(), "images/"+newsItem.toSHA1Hash()+".jpg")).into(newsDetailImageView);
+        }else {
+            if (newsItem.imageUrl != null && !newsItem.imageUrl.isEmpty()) {
+                newsDetailImageView.setVisibility(View.VISIBLE);
+                Glide.with(this).load(newsItem.imageUrl).into(newsDetailImageView);
+            } else {
+                newsDetailImageView.setVisibility(View.GONE);
+            }
         }
         if (newsItem.sourceName != null && !newsItem.sourceName.isEmpty()) {
             newsDetailSourceName.setText(newsItem.sourceName);
@@ -142,5 +152,6 @@ public class NewsDetailActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(EXTRA_NEWS_ITEM, newsItem);
+        outState.putSerializable(EXTRA_NEWS_CATEGORY, newsCategory);
     }
 }

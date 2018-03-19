@@ -36,6 +36,7 @@ import com.bumptech.glide.request.transition.Transition;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -135,15 +136,6 @@ public class NewsListFragment extends Fragment {
         newsItemArrayList = OfflineNewsHelper.readOfflineNews(getContext());
         newsListPullToRefreshLayout.setRefreshing(false);
         updateRecyclerView();
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        //update offline news when user back to this fragment
-        if (newsCategory == NewsCategory.OFFLINE_NEWS && isVisibleToUser) {
-            getOfflineNews();
-        }
     }
 
     private void getNewsFromAPI() {
@@ -247,36 +239,40 @@ public class NewsListFragment extends Fragment {
 
         public void applyData(NewsItem newsItem) {
             newsItemContainer.setTag(R.id.newsItem, newsItem);
-            if (newsItem.imageUrl != null) {
-                Glide.with(newsItemImageView)
-                        .load(newsItem.imageUrl)
-                        .apply(new RequestOptions().placeholder(R.drawable.splash_screen_background_drawable))
-                        .into(new SimpleTarget<Drawable>() {
+            if(newsCategory == NewsCategory.OFFLINE_NEWS){
+                Glide.with(itemView.getContext()).load(new File(getContext().getFilesDir(), "images/"+newsItem.toSHA1Hash()+".jpg")).into(newsItemImageView);
+            }else {
+                if (newsItem.imageUrl != null) {
+                    Glide.with(newsItemImageView)
+                            .load(newsItem.imageUrl)
+                            .apply(new RequestOptions().placeholder(R.drawable.splash_screen_background_drawable))
+                            .into(new SimpleTarget<Drawable>() {
 
-                            @Override
-                            public void onLoadStarted(@Nullable Drawable placeholder) {
-                                super.onLoadStarted(placeholder);
-                                newsItemImageView.setImageDrawable(placeholder);
-                                newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                            }
+                                @Override
+                                public void onLoadStarted(@Nullable Drawable placeholder) {
+                                    super.onLoadStarted(placeholder);
+                                    newsItemImageView.setImageDrawable(placeholder);
+                                    newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                                }
 
-                            @Override
-                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                newsItemImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                                newsItemImageView.setImageDrawable(resource);
-                            }
+                                @Override
+                                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                                    newsItemImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                    newsItemImageView.setImageDrawable(resource);
+                                }
 
 
-                            @Override
-                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                                super.onLoadFailed(errorDrawable);
-                                newsItemImageView.setImageDrawable(errorDrawable);
-                                newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                            }
-                        });
-            } else {
-                newsItemImageView.setImageResource(R.drawable.splash_screen_background_drawable);
-                newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                                @Override
+                                public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                    super.onLoadFailed(errorDrawable);
+                                    newsItemImageView.setImageDrawable(errorDrawable);
+                                    newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                                }
+                            });
+                } else {
+                    newsItemImageView.setImageResource(R.drawable.splash_screen_background_drawable);
+                    newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                }
             }
             if (newsItem.title == null) {
                 newsTitleTextView.setVisibility(View.GONE);
@@ -312,6 +308,7 @@ public class NewsListFragment extends Fragment {
             }
             Intent intent = new Intent(getContext(), NewsDetailActivity.class);
             intent.putExtra(NewsDetailActivity.EXTRA_NEWS_ITEM, newsItem);
+            intent.putExtra(NewsDetailActivity.EXTRA_NEWS_CATEGORY, newsCategory);
             startActivity(intent);
         }
     }
