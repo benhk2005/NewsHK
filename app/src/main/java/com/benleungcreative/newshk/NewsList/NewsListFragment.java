@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -175,14 +176,17 @@ public class NewsListFragment extends Fragment {
         }
     }
 
-    private class NewsItemViewHolder extends RecyclerView.ViewHolder {
+    private class NewsItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        private FrameLayout newsItemContainer;
         private ImageView newsItemImageView;
         private TextView newsTitleTextView;
         private TextView newsContentTextView;
 
         public NewsItemViewHolder(View itemView) {
             super(itemView);
+            newsItemContainer = itemView.findViewById(R.id.newsItemContainer);
+            newsItemContainer.setOnClickListener(this);
             newsItemImageView = itemView.findViewById(R.id.newsItemImageView);
             newsTitleTextView = itemView.findViewById(R.id.newsTitleTextView);
             newsContentTextView = itemView.findViewById(R.id.newsContentTextView);
@@ -234,6 +238,11 @@ public class NewsListFragment extends Fragment {
             }
         }
 
+        @Override
+        public void onClick(View v) {
+
+
+        }
     }
 
 }
