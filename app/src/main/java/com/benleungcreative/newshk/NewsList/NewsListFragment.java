@@ -15,6 +15,7 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ import com.benleungcreative.newshk.Classes.MyRequest;
 import com.benleungcreative.newshk.Classes.NewsCategory;
 import com.benleungcreative.newshk.Classes.NewsItem;
 import com.benleungcreative.newshk.Helpers.APIHelper;
+import com.benleungcreative.newshk.Helpers.ConnectivityHelper;
 import com.benleungcreative.newshk.NewsDetail.NewsDetailActivity;
 import com.benleungcreative.newshk.R;
 import com.bumptech.glide.Glide;
@@ -43,19 +45,14 @@ public class NewsListFragment extends Fragment {
 
     private static final String EXTRA_NEWS_CATEGORY = "EXTRA_NEWS_CATEGORY";
     private static final String EXTRA_NEWS_ITEM_ARRAY_LIST = "EXTRA_NEWS_ITEM_ARRAY_LIST";
-
-//    private static final String API_CATEGORY_TOP_CATEGORY = "";
-//    private static final String API_CATEGORY_BUSINESS = "business";
-//    private static final String API_CATEGORY_ENTERTAINMENT = "entertainment";
-//    private static final String API_CATEGORY_HEALTH = "health";
-//    private static final String API_CATEGORY_SCIENCE = "science";
-//    private static final String API_CATEGORY_SPORTS = "sports";
-//    private static final String API_CATEGORY_TECHNOLOGY = "technology";
+    private static final String EXTRA_ERROR_UI_SHOWING = "EXTRA_ERROR_UI_SHOWING";
 
     private RecyclerView newsListRecyclerView;
+    private View unableToFetchNewsContainer;
     private NewsCategory newsCategory;
     private ArrayList<NewsItem> newsItemArrayList;
     private SwipeRefreshLayout newsListPullToRefreshLayout;
+    private Button newsListRetryButton;
 
     public NewsListFragment() {
     }
@@ -86,6 +83,7 @@ public class NewsListFragment extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putSerializable(EXTRA_NEWS_CATEGORY, newsCategory);
         outState.putSerializable(EXTRA_NEWS_ITEM_ARRAY_LIST, newsItemArrayList);
+        outState.putBoolean(EXTRA_ERROR_UI_SHOWING, unableToFetchNewsContainer.getVisibility() == View.VISIBLE);
     }
 
     @Override
@@ -97,7 +95,9 @@ public class NewsListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        unableToFetchNewsContainer = view.findViewById(R.id.unableToFetchNewsContainer);
         newsListPullToRefreshLayout = view.findViewById(R.id.newsListPullToRefreshLayout);
+        newsListRetryButton = view.findViewById(R.id.newsListRetryButton);
         newsListPullToRefreshLayout.setColorSchemeColors(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null));
         newsListRecyclerView = view.findViewById(R.id.newsListRecyclerView);
         newsListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
@@ -105,6 +105,8 @@ public class NewsListFragment extends Fragment {
         if (savedInstanceState == null) {
             showLoadingUI();
             getNewsFromAPI();
+        } else {
+            unableToFetchNewsContainer.setVisibility(savedInstanceState.getBoolean(EXTRA_ERROR_UI_SHOWING, false)?View.VISIBLE:View.GONE);
         }
         newsListPullToRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -112,36 +114,48 @@ public class NewsListFragment extends Fragment {
                 getNewsFromAPI();
             }
         });
+        newsListRetryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getNewsFromAPI();
+            }
+        });
     }
 
     private void getNewsFromAPI() {
-        showLoadingUI();
-        APIHelper.getInstance().getNewsList(this, newsCategory.toAPIKey(), new MyRequest.MyRequestCallback() {
-            @Override
-            public void onSuccess(JSONObject jsonObject) throws IOException {
-                JSONArray articlesJSONArray = jsonObject.optJSONArray("articles");
-                if (articlesJSONArray == null) {
-                    throw new IOException("articles not found");
-                } else {
-                    for (int i = 0; i < articlesJSONArray.length(); i++) {
-                        JSONObject articleJSONObj = articlesJSONArray.optJSONObject(i);
-                        NewsItem tmpNewsItem = com.benleungcreative.newshk.Classes.NewsItem.fromJSONObject(articleJSONObj);
-                        if (tmpNewsItem != null) {
-                            newsItemArrayList.add(tmpNewsItem);
+        if(ConnectivityHelper.hasConnection(getContext())) {
+            hideNetworkErrorUI();
+            showLoadingUI();
+            APIHelper.getInstance().getNewsList(this, newsCategory.toAPIKey(), new MyRequest.MyRequestCallback() {
+                @Override
+                public void onSuccess(JSONObject jsonObject) throws IOException {
+                    JSONArray articlesJSONArray = jsonObject.optJSONArray("articles");
+                    if (articlesJSONArray == null) {
+                        throw new IOException("articles not found");
+                    } else {
+                        for (int i = 0; i < articlesJSONArray.length(); i++) {
+                            JSONObject articleJSONObj = articlesJSONArray.optJSONObject(i);
+                            NewsItem tmpNewsItem = com.benleungcreative.newshk.Classes.NewsItem.fromJSONObject(articleJSONObj);
+                            if (tmpNewsItem != null) {
+                                newsItemArrayList.add(tmpNewsItem);
+                            }
                         }
+                        updateRecyclerView();
+                        hideLoadingUI();
                     }
-                    updateRecyclerView();
-                    hideLoadingUI();
+                    newsListPullToRefreshLayout.setRefreshing(false);
                 }
-                newsListPullToRefreshLayout.setRefreshing(false);
-            }
 
-            @Override
-            public void onFail(Exception e) {
-                e.printStackTrace();
-                newsListPullToRefreshLayout.setRefreshing(false);
-            }
-        });
+                @Override
+                public void onFail(Exception e) {
+                    e.printStackTrace();
+                    newsListPullToRefreshLayout.setRefreshing(false);
+                    showNetworkErrorUI();
+                }
+            });
+        } else {
+            showNetworkErrorUI();
+        }
     }
 
     private void updateRecyclerView() {
@@ -159,6 +173,14 @@ public class NewsListFragment extends Fragment {
 
     private void hideLoadingUI() {
         newsListPullToRefreshLayout.setRefreshing(false);
+    }
+
+    private void showNetworkErrorUI(){
+        unableToFetchNewsContainer.setVisibility(View.VISIBLE);
+    }
+
+    private void hideNetworkErrorUI(){
+        unableToFetchNewsContainer.setVisibility(View.GONE);
     }
 
     private class NewsListAdapter extends RecyclerView.Adapter<NewsItemViewHolder> {

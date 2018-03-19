@@ -12,4 +12,7 @@
     <string name="news_detail_title">新聞內容</string>
     <string name="share">分享</string>
 
+    <string name="unable_to_fetch_news">無法取得新聞，請檢查網路連線然後重試。</string>
+    <string name="retry">重試</string>
+
 </resources>

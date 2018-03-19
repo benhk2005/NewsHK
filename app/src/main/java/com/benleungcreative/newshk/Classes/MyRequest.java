@@ -50,8 +50,14 @@ public class MyRequest {
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
-                Activity activity = activityWeakReference.get();
-                Fragment fragment = fragmentWeakReference.get();
+                Activity activity = null;
+                Fragment fragment = null;
+                if (activityWeakReference != null) {
+                    activity = activityWeakReference.get();
+                }
+                if (fragmentWeakReference != null) {
+                    fragment = fragmentWeakReference.get();
+                }
                 if (activity == null && fragment == null) {
                     return;
                 }
