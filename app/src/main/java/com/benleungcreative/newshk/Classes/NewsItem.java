@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -15,7 +16,7 @@ import java.util.Locale;
 
 public class NewsItem implements Serializable {
 
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'", Locale.ENGLISH);
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
 
     public String sourceName;
     public String title;
@@ -36,32 +37,37 @@ public class NewsItem implements Serializable {
             return null;
         }
         NewsItem newsItem = new NewsItem();
-        if(!jsonObject.isNull("title")) {
+        if (!jsonObject.isNull("title")) {
             newsItem.title = jsonObject.optString("title");
         }
-        if(!jsonObject.isNull("description")) {
+        if (!jsonObject.isNull("description")) {
             newsItem.content = jsonObject.optString("description");
         }
-        if(!jsonObject.isNull("url")) {
+        if (!jsonObject.isNull("url")) {
             newsItem.url = jsonObject.optString("url", null);
         }
-        if(!jsonObject.isNull("urlToImage")) {
+        if (!jsonObject.isNull("urlToImage")) {
             newsItem.imageUrl = jsonObject.optString("urlToImage", null);
             if (newsItem.imageUrl.startsWith("//")) {
                 newsItem.imageUrl = "http:" + newsItem.imageUrl;
             }
         }
-        try{
+        try {
             String publishedAt = jsonObject.optString("publishedAt", null);
-            if(publishedAt != null){
-                newsItem.publishedAt = simpleDateFormat.parse(publishedAt);
+            if (publishedAt != null) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(simpleDateFormat.parse(publishedAt));
+                calendar.add(Calendar.HOUR_OF_DAY, 8);
+//                calendar.setTimeZone(SimpleTimeZone.getTimeZone("GMT+8"));
+                newsItem.publishedAt = calendar.getTime();
+//                newsItem.publishedAt = simpleDateFormat.parse(publishedAt);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         JSONObject srcJSONObj = jsonObject.optJSONObject("source");
-        if(srcJSONObj != null){
+        if (srcJSONObj != null) {
             newsItem.sourceName = srcJSONObj.optString("name", null);
         }
         return newsItem;

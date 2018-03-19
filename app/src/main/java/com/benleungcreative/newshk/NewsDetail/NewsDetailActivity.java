@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,9 @@ import com.benleungcreative.newshk.Classes.NewsItem;
 import com.benleungcreative.newshk.R;
 import com.bumptech.glide.Glide;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class NewsDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_NEWS_ITEM = "EXTRA_NEWS_ITEM";
@@ -22,12 +26,16 @@ public class NewsDetailActivity extends AppCompatActivity {
     private NewsItem newsItem;
     private Toolbar newsDetailToolbar;
     private TextView newsDetailTitle;
+    private TextView newsDateTime;
     private TextView newsDetailContent;
     private ImageView newsDetailImageView;
+
+    private SimpleDateFormat simpleDateFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        simpleDateFormat = new SimpleDateFormat(DateFormat.getBestDateTimePattern(Locale.getDefault(), "yyyy/MM/dd hh:mm aa"), Locale.getDefault());
         setContentView(R.layout.activity_news_detail);
         if (savedInstanceState == null) {
             Intent intent = getIntent();
@@ -41,6 +49,7 @@ public class NewsDetailActivity extends AppCompatActivity {
         }
         newsDetailToolbar = findViewById(R.id.newsDetailToolbar);
         newsDetailTitle = findViewById(R.id.newsDetailTitle);
+        newsDateTime = findViewById(R.id.newsDateTime);
         newsDetailContent = findViewById(R.id.newsDetailContent);
         newsDetailImageView = findViewById(R.id.newsDetailImageView);
 
@@ -50,6 +59,7 @@ public class NewsDetailActivity extends AppCompatActivity {
         actionBar.setDisplayShowHomeEnabled(true);
 
         newsDetailTitle.setText(newsItem.title);
+        newsDateTime.setText(simpleDateFormat.format(newsItem.publishedAt));
         newsDetailContent.setText(newsItem.content);
         if (newsItem.imageUrl != null && !newsItem.imageUrl.isEmpty()) {
             newsDetailImageView.setVisibility(View.VISIBLE);

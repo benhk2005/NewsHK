@@ -11,6 +11,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -183,6 +184,7 @@ public class NewsListFragment extends Fragment {
         private FrameLayout newsItemContainer;
         private ImageView newsItemImageView;
         private TextView newsTitleTextView;
+        private TextView newsRelativeTimeTextView;
         private TextView newsContentTextView;
 
         public NewsItemViewHolder(View itemView) {
@@ -191,6 +193,7 @@ public class NewsListFragment extends Fragment {
             newsItemContainer.setOnClickListener(this);
             newsItemImageView = itemView.findViewById(R.id.newsItemImageView);
             newsTitleTextView = itemView.findViewById(R.id.newsTitleTextView);
+            newsRelativeTimeTextView = itemView.findViewById(R.id.newsRelativeTimeTextView);
             newsContentTextView = itemView.findViewById(R.id.newsContentTextView);
         }
 
@@ -239,12 +242,18 @@ public class NewsListFragment extends Fragment {
                 newsTitleTextView.setVisibility(View.VISIBLE);
                 newsContentTextView.setText(newsItem.content);
             }
+            if (newsItem.publishedAt != null) {
+                newsRelativeTimeTextView.setVisibility(View.VISIBLE);
+                newsRelativeTimeTextView.setText(DateUtils.getRelativeTimeSpanString(newsItem.publishedAt.getTime(), System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_NUMERIC_DATE));
+            } else {
+                newsRelativeTimeTextView.setVisibility(View.GONE);
+            }
         }
 
         @Override
         public void onClick(View v) {
             NewsItem newsItem = (NewsItem) v.getTag(R.id.newsItem);
-            if(newsItem == null){
+            if (newsItem == null) {
                 return;
             }
             Intent intent = new Intent(getContext(), NewsDetailActivity.class);
