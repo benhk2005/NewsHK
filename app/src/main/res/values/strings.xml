@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">NewsHK</string>
 
-    <string name="tab_top_headlines">Top Headlines</string>
-    <string name="tab_business">Business</string>
-    <string name="tab_entertainment">Entertainment</string>
-    <string name="tab_health">Health</string>
-    <string name="tab_science">Science</string>
-    <string name="tab_sports">Sports</string>
-    <string name="tab_technology">Technology</string>
+    <string name="tab_top_headlines">熱門新聞</string>
+    <string name="tab_business">財經</string>
+    <string name="tab_entertainment">娛樂</string>
+    <string name="tab_health">健康</string>
+    <string name="tab_science">科學</string>
+    <string name="tab_sports">體育</string>
+    <string name="tab_technology">科技</string>
 
     <string name="news_detail_title">新聞內容</string>
     <string name="share">分享</string>
