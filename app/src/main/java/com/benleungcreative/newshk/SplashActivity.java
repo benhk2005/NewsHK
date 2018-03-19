@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final int LAUNCH_MAIN_ACTIVITY_DELAY = 3000;
+    private static final int LAUNCH_MAIN_ACTIVITY_DELAY = 1500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

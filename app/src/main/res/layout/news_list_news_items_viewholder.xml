@@ -37,6 +37,13 @@
         android:paddingTop="10dp">
 
         <TextView
+            android:id="@+id/newsRelativeTimeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#fff" />
+
+        <TextView
             android:id="@+id/newsTitleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
