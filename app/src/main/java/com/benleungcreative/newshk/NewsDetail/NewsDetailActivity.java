@@ -2,27 +2,91 @@ package com.benleungcreative.newshk.NewsDetail;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ShareCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.benleungcreative.newshk.Classes.NewsItem;
 import com.benleungcreative.newshk.R;
+import com.bumptech.glide.Glide;
 
 public class NewsDetailActivity extends AppCompatActivity {
 
-    private static final String EXTRA_NEWS_ITEM = "EXTRA_NEWS_ITEM";
+    public static final String EXTRA_NEWS_ITEM = "EXTRA_NEWS_ITEM";
 
     private NewsItem newsItem;
+    private Toolbar newsDetailToolbar;
+    private TextView newsDetailTitle;
+    private TextView newsDetailContent;
+    private ImageView newsDetailImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_detail);
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             Intent intent = getIntent();
             newsItem = (NewsItem) intent.getSerializableExtra(EXTRA_NEWS_ITEM);
         } else {
             newsItem = (NewsItem) savedInstanceState.getSerializable(EXTRA_NEWS_ITEM);
         }
+        if (newsItem == null) {
+            finish();
+            return;
+        }
+        newsDetailToolbar = findViewById(R.id.newsDetailToolbar);
+        newsDetailTitle = findViewById(R.id.newsDetailTitle);
+        newsDetailContent = findViewById(R.id.newsDetailContent);
+        newsDetailImageView = findViewById(R.id.newsDetailImageView);
+
+        setSupportActionBar(newsDetailToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
+
+        newsDetailTitle.setText(newsItem.title);
+        newsDetailContent.setText(newsItem.content);
+        if (newsItem.imageUrl != null && !newsItem.imageUrl.isEmpty()) {
+            newsDetailImageView.setVisibility(View.VISIBLE);
+            Glide.with(this).load(newsItem.imageUrl).into(newsDetailImageView);
+        } else {
+            newsDetailImageView.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.news_detail_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.shareActionButton:
+                shareNewsItem();
+                return true;
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void shareNewsItem(){
+        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                .setText(newsItem.content)
+                .setType("text/plain")
+                .createChooserIntent();
+        startActivity(shareIntent);
     }
 
     @Override

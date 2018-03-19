@@ -1,6 +1,7 @@
 package com.benleungcreative.newshk.NewsList;
 
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,6 +22,7 @@ import com.benleungcreative.newshk.Classes.MyRequest;
 import com.benleungcreative.newshk.Classes.NewsCategory;
 import com.benleungcreative.newshk.Classes.NewsItem;
 import com.benleungcreative.newshk.Helpers.APIHelper;
+import com.benleungcreative.newshk.NewsDetail.NewsDetailActivity;
 import com.benleungcreative.newshk.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -193,6 +195,7 @@ public class NewsListFragment extends Fragment {
         }
 
         public void applyData(NewsItem newsItem) {
+            newsItemContainer.setTag(R.id.newsItem, newsItem);
             if (newsItem.imageUrl != null) {
                 Glide.with(newsItemImageView)
                         .load(newsItem.imageUrl)
@@ -240,8 +243,13 @@ public class NewsListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-
-
+            NewsItem newsItem = (NewsItem) v.getTag(R.id.newsItem);
+            if(newsItem == null){
+                return;
+            }
+            Intent intent = new Intent(getContext(), NewsDetailActivity.class);
+            intent.putExtra(NewsDetailActivity.EXTRA_NEWS_ITEM, newsItem);
+            startActivity(intent);
         }
     }
 

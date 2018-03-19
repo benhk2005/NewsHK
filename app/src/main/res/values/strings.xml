@@ -8,4 +8,8 @@
     <string name="tab_science">Science</string>
     <string name="tab_sports">Sports</string>
     <string name="tab_technology">Technology</string>
+
+    <string name="news_detail_title">新聞內容</string>
+    <string name="share">分享</string>
+
 </resources>
