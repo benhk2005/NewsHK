@@ -11,7 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.benleungcreative.newshk.BuildConfig;
 import com.benleungcreative.newshk.Classes.NewsItem;
 import com.benleungcreative.newshk.R;
 import com.bumptech.glide.Glide;
@@ -75,6 +77,11 @@ public class NewsDetailActivity extends AppCompatActivity {
         } else {
             newsDetailSourceName.setVisibility(View.GONE);
         }
+
+        if(BuildConfig.DEBUG){
+            Toast.makeText(this, newsItem.toSHA1Hash(), Toast.LENGTH_LONG).show();
+        }
+
     }
 
     @Override

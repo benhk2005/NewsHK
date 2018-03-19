@@ -2,9 +2,15 @@ package com.benleungcreative.newshk.Classes;
 
 import android.support.annotation.Nullable;
 
+import com.benleungcreative.newshk.Helpers.FormatHelper;
+import com.crashlytics.android.Crashlytics;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -70,6 +76,85 @@ public class NewsItem implements Serializable {
             newsItem.sourceName = srcJSONObj.optString("name", null);
         }
         return newsItem;
+    }
+
+    public String toSHA1Hash(){
+        try {
+            MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+            StringBuilder stringBuilder = new StringBuilder();
+            if(title != null && !title.isEmpty()) {
+                stringBuilder.append(title);
+            }
+            if(content != null && content.isEmpty()){
+                stringBuilder.append(content);
+            }
+            if(sourceName != null && !sourceName.isEmpty()){
+                stringBuilder.append(sourceName);
+            }
+            if(url != null && !url.isEmpty()){
+                stringBuilder.append(url);
+            }
+            byte[] dataForHash = stringBuilder.toString().getBytes();
+            String hashHex = FormatHelper.bytesToHex(sha1.digest(dataForHash));
+            return hashHex;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            Crashlytics.logException(e);
+        }
+        return "";
+    }
+
+    public JSONObject toJSONObjectForSaveInSharedPref(){
+        JSONObject jsonObject = new JSONObject();
+        if(sourceName != null && !sourceName.isEmpty()) {
+            try {
+                jsonObject.put("sourceName", sourceName);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Crashlytics.logException(e);
+            }
+        }
+        if(title != null && !title.isEmpty()){
+            try {
+                jsonObject.put("title", title);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Crashlytics.logException(e);
+            }
+        }
+        if(content != null && !content.isEmpty()){
+            try {
+                jsonObject.put("content", content);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Crashlytics.logException(e);
+            }
+        }
+        if(url != null && !url.isEmpty()){
+            try {
+                jsonObject.put("url", url);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Crashlytics.logException(e);
+            }
+        }
+        if(imageUrl != null && !imageUrl.isEmpty()){
+            try {
+                jsonObject.put("imageUrl", imageUrl);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Crashlytics.logException(e);
+            }
+        }
+        if(publishedAt != null){
+            try {
+                jsonObject.put("publishedAt", publishedAt.getTime());
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Crashlytics.logException(e);
+            }
+        }
+        return jsonObject;
     }
 
 }
