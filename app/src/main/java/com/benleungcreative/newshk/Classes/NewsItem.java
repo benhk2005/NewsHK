@@ -32,7 +32,7 @@ public class NewsItem implements Serializable {
     public Date publishedAt;
 
     @Nullable
-    public static NewsItem fromJSONObject(JSONObject jsonObject) {
+    public static NewsItem fromApiJsonObject(JSONObject jsonObject) {
         if (jsonObject == null) {
             return null;
         }
@@ -78,25 +78,24 @@ public class NewsItem implements Serializable {
         return newsItem;
     }
 
-    public String toSHA1Hash(){
+    public String toSHA1Hash() {
         try {
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
             StringBuilder stringBuilder = new StringBuilder();
-            if(title != null && !title.isEmpty()) {
+            if (title != null && !title.isEmpty()) {
                 stringBuilder.append(title);
             }
-            if(content != null && content.isEmpty()){
+            if (content != null && content.isEmpty()) {
                 stringBuilder.append(content);
             }
-            if(sourceName != null && !sourceName.isEmpty()){
+            if (sourceName != null && !sourceName.isEmpty()) {
                 stringBuilder.append(sourceName);
             }
-            if(url != null && !url.isEmpty()){
+            if (url != null && !url.isEmpty()) {
                 stringBuilder.append(url);
             }
             byte[] dataForHash = stringBuilder.toString().getBytes();
-            String hashHex = FormatHelper.bytesToHex(sha1.digest(dataForHash));
-            return hashHex;
+            return FormatHelper.bytesToHex(sha1.digest(dataForHash));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             Crashlytics.logException(e);
@@ -104,9 +103,9 @@ public class NewsItem implements Serializable {
         return "";
     }
 
-    public JSONObject toJSONObjectForSaveInSharedPref(){
+    public JSONObject toJSONObjectForSaveInSharedPref() {
         JSONObject jsonObject = new JSONObject();
-        if(sourceName != null && !sourceName.isEmpty()) {
+        if (sourceName != null && !sourceName.isEmpty()) {
             try {
                 jsonObject.put("sourceName", sourceName);
             } catch (JSONException e) {
@@ -114,7 +113,7 @@ public class NewsItem implements Serializable {
                 Crashlytics.logException(e);
             }
         }
-        if(title != null && !title.isEmpty()){
+        if (title != null && !title.isEmpty()) {
             try {
                 jsonObject.put("title", title);
             } catch (JSONException e) {
@@ -122,7 +121,7 @@ public class NewsItem implements Serializable {
                 Crashlytics.logException(e);
             }
         }
-        if(content != null && !content.isEmpty()){
+        if (content != null && !content.isEmpty()) {
             try {
                 jsonObject.put("content", content);
             } catch (JSONException e) {
@@ -130,7 +129,7 @@ public class NewsItem implements Serializable {
                 Crashlytics.logException(e);
             }
         }
-        if(url != null && !url.isEmpty()){
+        if (url != null && !url.isEmpty()) {
             try {
                 jsonObject.put("url", url);
             } catch (JSONException e) {
@@ -138,7 +137,7 @@ public class NewsItem implements Serializable {
                 Crashlytics.logException(e);
             }
         }
-        if(imageUrl != null && !imageUrl.isEmpty()){
+        if (imageUrl != null && !imageUrl.isEmpty()) {
             try {
                 jsonObject.put("imageUrl", imageUrl);
             } catch (JSONException e) {
@@ -146,7 +145,7 @@ public class NewsItem implements Serializable {
                 Crashlytics.logException(e);
             }
         }
-        if(publishedAt != null){
+        if (publishedAt != null) {
             try {
                 jsonObject.put("publishedAt", publishedAt.getTime());
             } catch (JSONException e) {
@@ -155,6 +154,35 @@ public class NewsItem implements Serializable {
             }
         }
         return jsonObject;
+    }
+
+    @Nullable
+    public static NewsItem fromSharedPrefJSONObject(JSONObject jsonObject) {
+        if (jsonObject == null) {
+            return null;
+        }
+        try {
+            String title = jsonObject.optString("title", null);
+            String content = jsonObject.optString("content", null);
+            if (title == null && content == null) {
+                return null;
+            }
+            NewsItem newsItem = new NewsItem();
+            newsItem.title = title;
+            newsItem.content = content;
+            newsItem.sourceName = jsonObject.optString("sourceName", null);
+            newsItem.url = jsonObject.optString("url", null);
+            newsItem.imageUrl = jsonObject.optString("imageUrl", null);
+            long publishedAtLong = jsonObject.optLong("publishedAt", -1L);
+            if(publishedAtLong >= 0){
+                newsItem.publishedAt = new Date(publishedAtLong);
+            }
+            return newsItem;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Crashlytics.logException(e);
+        }
+        return null;
     }
 
 }

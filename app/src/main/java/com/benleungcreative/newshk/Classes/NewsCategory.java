@@ -6,11 +6,13 @@ package com.benleungcreative.newshk.Classes;
 
 public enum NewsCategory {
 
-    TOP_CATEGORY, BUSINESS, ENTERTAINMENT, HEALTH, SCIENCE, SPORTS, TECHNOLOGY;
+    OFFLINE_NEWS, TOP_CATEGORY, BUSINESS, ENTERTAINMENT, HEALTH, SCIENCE, SPORTS, TECHNOLOGY;
 
 
     public String toAPIKey(){
         switch (this){
+            case OFFLINE_NEWS:
+                return "";
             case BUSINESS:
                 return "business";
             case ENTERTAINMENT:

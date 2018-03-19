@@ -25,6 +25,7 @@ import com.benleungcreative.newshk.Classes.NewsCategory;
 import com.benleungcreative.newshk.Classes.NewsItem;
 import com.benleungcreative.newshk.Helpers.APIHelper;
 import com.benleungcreative.newshk.Helpers.ConnectivityHelper;
+import com.benleungcreative.newshk.Helpers.OfflineNewsHelper;
 import com.benleungcreative.newshk.NewsDetail.NewsDetailActivity;
 import com.benleungcreative.newshk.R;
 import com.bumptech.glide.Glide;
@@ -103,15 +104,22 @@ public class NewsListFragment extends Fragment {
         newsListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         newsListRecyclerView.setAdapter(new NewsListAdapter());
         if (savedInstanceState == null) {
-            showLoadingUI();
-            getNewsFromAPI();
+            if (newsCategory == NewsCategory.OFFLINE_NEWS) {
+                getOfflineNews();
+            } else {
+                getNewsFromAPI();
+            }
         } else {
             unableToFetchNewsContainer.setVisibility(savedInstanceState.getBoolean(EXTRA_ERROR_UI_SHOWING, false) ? View.VISIBLE : View.GONE);
         }
         newsListPullToRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getNewsFromAPI();
+                if (newsCategory == NewsCategory.OFFLINE_NEWS) {
+                    getOfflineNews();
+                } else {
+                    getNewsFromAPI();
+                }
             }
         });
         newsListRetryButton.setOnClickListener(new View.OnClickListener() {
@@ -120,6 +128,22 @@ public class NewsListFragment extends Fragment {
                 getNewsFromAPI();
             }
         });
+    }
+
+    private void getOfflineNews() {
+        hideNetworkErrorUI();
+        newsItemArrayList = OfflineNewsHelper.readOfflineNews(getContext());
+        newsListPullToRefreshLayout.setRefreshing(false);
+        updateRecyclerView();
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        //update offline news when user back to this fragment
+        if (newsCategory == NewsCategory.OFFLINE_NEWS && isVisibleToUser) {
+            getOfflineNews();
+        }
     }
 
     private void getNewsFromAPI() {
@@ -135,7 +159,7 @@ public class NewsListFragment extends Fragment {
                     } else {
                         for (int i = 0; i < articlesJSONArray.length(); i++) {
                             JSONObject articleJSONObj = articlesJSONArray.optJSONObject(i);
-                            NewsItem tmpNewsItem = com.benleungcreative.newshk.Classes.NewsItem.fromJSONObject(articleJSONObj);
+                            NewsItem tmpNewsItem = com.benleungcreative.newshk.Classes.NewsItem.fromApiJsonObject(articleJSONObj);
                             if (tmpNewsItem != null) {
                                 newsItemArrayList.add(tmpNewsItem);
                             }

@@ -13,8 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.benleungcreative.newshk.BuildConfig;
 import com.benleungcreative.newshk.Classes.NewsItem;
+import com.benleungcreative.newshk.Helpers.OfflineNewsHelper;
 import com.benleungcreative.newshk.R;
 import com.bumptech.glide.Glide;
 
@@ -78,15 +78,15 @@ public class NewsDetailActivity extends AppCompatActivity {
             newsDetailSourceName.setVisibility(View.GONE);
         }
 
-        if(BuildConfig.DEBUG){
-            Toast.makeText(this, newsItem.toSHA1Hash(), Toast.LENGTH_LONG).show();
-        }
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.news_detail_menu, menu);
+        if(OfflineNewsHelper.isNewsSaved(this, newsItem.toSHA1Hash())){
+            menu.findItem(R.id.downloadedDoneActionButton).setVisible(true);
+            menu.findItem(R.id.downloadActionButton).setVisible(false);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -94,6 +94,9 @@ public class NewsDetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+            case R.id.downloadActionButton:
+                saveNewsForOffline();
+                return true;
             case R.id.shareActionButton:
                 shareNewsItem();
                 return true;
@@ -113,6 +116,12 @@ public class NewsDetailActivity extends AppCompatActivity {
         }
         intent.putExtra(Intent.EXTRA_TEXT, prepareShareText());
         startActivity(Intent.createChooser(intent, null));
+    }
+
+    private void saveNewsForOffline(){
+        OfflineNewsHelper.saveNewsForOffline(this, newsItem);
+        Toast.makeText(this, getString(R.string.news_has_been_downloaded), Toast.LENGTH_LONG).show();
+        invalidateOptionsMenu();
     }
 
     private String prepareShareText() {

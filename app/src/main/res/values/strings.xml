@@ -15,4 +15,8 @@
     <string name="unable_to_fetch_news">無法取得新聞，請檢查網路連線然後重試。</string>
     <string name="retry">重試</string>
 
+    <string name="downloaded_news">已下載新聞</string>
+    <string name="download_for_offline">下載作離線時觀看</string>
+    <string name="news_has_been_downloaded">新聞已下載</string>
+
 </resources>
