@@ -47,7 +47,7 @@
                 android:layout_marginRight="5dp"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
-                android:background="@color/colorPrimary"
+                android:background="@color/colorPrimaryDark"
                 android:textColor="#fff"
                 android:textSize="14sp"/>
 
