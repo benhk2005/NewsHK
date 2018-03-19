@@ -55,12 +55,11 @@ public class NewsItem implements Serializable {
         try {
             String publishedAt = jsonObject.optString("publishedAt", null);
             if (publishedAt != null) {
+                //Workaround for android parse yyyy-MM-ddTHH:mm:ssZ format with incorrect timezone
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(simpleDateFormat.parse(publishedAt));
                 calendar.add(Calendar.HOUR_OF_DAY, 8);
-//                calendar.setTimeZone(SimpleTimeZone.getTimeZone("GMT+8"));
                 newsItem.publishedAt = calendar.getTime();
-//                newsItem.publishedAt = simpleDateFormat.parse(publishedAt);
             }
         } catch (Exception e) {
             e.printStackTrace();
