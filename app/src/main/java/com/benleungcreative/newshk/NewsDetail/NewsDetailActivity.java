@@ -26,6 +26,7 @@ public class NewsDetailActivity extends AppCompatActivity {
     private NewsItem newsItem;
     private Toolbar newsDetailToolbar;
     private TextView newsDetailTitle;
+    private TextView newsDetailSourceName;
     private TextView newsDateTime;
     private TextView newsDetailContent;
     private ImageView newsDetailImageView;
@@ -49,6 +50,7 @@ public class NewsDetailActivity extends AppCompatActivity {
         }
         newsDetailToolbar = findViewById(R.id.newsDetailToolbar);
         newsDetailTitle = findViewById(R.id.newsDetailTitle);
+        newsDetailSourceName = findViewById(R.id.newsDetailSourceName);
         newsDateTime = findViewById(R.id.newsDateTime);
         newsDetailContent = findViewById(R.id.newsDetailContent);
         newsDetailImageView = findViewById(R.id.newsDetailImageView);
@@ -66,6 +68,12 @@ public class NewsDetailActivity extends AppCompatActivity {
             Glide.with(this).load(newsItem.imageUrl).into(newsDetailImageView);
         } else {
             newsDetailImageView.setVisibility(View.GONE);
+        }
+        if (newsItem.sourceName != null && !newsItem.sourceName.isEmpty()) {
+            newsDetailSourceName.setText(newsItem.sourceName);
+            newsDetailSourceName.setVisibility(View.VISIBLE);
+        } else {
+            newsDetailSourceName.setVisibility(View.GONE);
         }
     }
 

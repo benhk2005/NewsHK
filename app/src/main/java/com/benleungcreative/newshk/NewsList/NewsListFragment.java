@@ -106,7 +106,7 @@ public class NewsListFragment extends Fragment {
             showLoadingUI();
             getNewsFromAPI();
         } else {
-            unableToFetchNewsContainer.setVisibility(savedInstanceState.getBoolean(EXTRA_ERROR_UI_SHOWING, false)?View.VISIBLE:View.GONE);
+            unableToFetchNewsContainer.setVisibility(savedInstanceState.getBoolean(EXTRA_ERROR_UI_SHOWING, false) ? View.VISIBLE : View.GONE);
         }
         newsListPullToRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -123,7 +123,7 @@ public class NewsListFragment extends Fragment {
     }
 
     private void getNewsFromAPI() {
-        if(ConnectivityHelper.hasConnection(getContext())) {
+        if (ConnectivityHelper.hasConnection(getContext())) {
             hideNetworkErrorUI();
             showLoadingUI();
             APIHelper.getInstance().getNewsList(this, newsCategory.toAPIKey(), new MyRequest.MyRequestCallback() {
@@ -175,11 +175,11 @@ public class NewsListFragment extends Fragment {
         newsListPullToRefreshLayout.setRefreshing(false);
     }
 
-    private void showNetworkErrorUI(){
+    private void showNetworkErrorUI() {
         unableToFetchNewsContainer.setVisibility(View.VISIBLE);
     }
 
-    private void hideNetworkErrorUI(){
+    private void hideNetworkErrorUI() {
         unableToFetchNewsContainer.setVisibility(View.GONE);
     }
 
@@ -205,6 +205,7 @@ public class NewsListFragment extends Fragment {
 
         private FrameLayout newsItemContainer;
         private ImageView newsItemImageView;
+        private TextView newsSourceNameTextView;
         private TextView newsTitleTextView;
         private TextView newsRelativeTimeTextView;
         private TextView newsContentTextView;
@@ -215,6 +216,7 @@ public class NewsListFragment extends Fragment {
             newsItemContainer.setOnClickListener(this);
             newsItemImageView = itemView.findViewById(R.id.newsItemImageView);
             newsTitleTextView = itemView.findViewById(R.id.newsTitleTextView);
+            newsSourceNameTextView = itemView.findViewById(R.id.newsSourceNameTextView);
             newsRelativeTimeTextView = itemView.findViewById(R.id.newsRelativeTimeTextView);
             newsContentTextView = itemView.findViewById(R.id.newsContentTextView);
         }
@@ -269,6 +271,12 @@ public class NewsListFragment extends Fragment {
                 newsRelativeTimeTextView.setText(DateUtils.getRelativeTimeSpanString(newsItem.publishedAt.getTime(), System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_NUMERIC_DATE));
             } else {
                 newsRelativeTimeTextView.setVisibility(View.GONE);
+            }
+            if (newsItem.sourceName != null && !newsItem.sourceName.isEmpty()) {
+                newsSourceNameTextView.setVisibility(View.VISIBLE);
+                newsSourceNameTextView.setText(newsItem.sourceName);
+            } else {
+                newsSourceNameTextView.setVisibility(View.GONE);
             }
         }
 
