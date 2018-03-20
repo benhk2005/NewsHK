@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import com.benleungcreative.newshk.Classes.NewsCategory;
 import com.benleungcreative.newshk.Helpers.ConnectivityHelper;
@@ -15,9 +16,13 @@ import com.benleungcreative.newshk.NewsList.NewsListFragment;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int BACK_BUTTON_LOCK_DURATION = 3000;
+
     private Toolbar mainToolbar;
     private TabLayout mainTabLayout;
     private ViewPager mainViewPager;
+    private Long lastBackButtonTimestamp = null;
+    private Toast lastExitToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,20 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 mainViewPager.setCurrentItem(0);
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (lastBackButtonTimestamp != null && System.currentTimeMillis() - lastBackButtonTimestamp < BACK_BUTTON_LOCK_DURATION) {
+            if (lastExitToast != null) {
+                lastExitToast.cancel();
+            }
+            super.onBackPressed();
+        } else {
+            lastBackButtonTimestamp = System.currentTimeMillis();
+            lastExitToast = Toast.makeText(this, getString(R.string.press_again_to_exit), Toast.LENGTH_LONG);
+            lastExitToast.show();
         }
     }
 
