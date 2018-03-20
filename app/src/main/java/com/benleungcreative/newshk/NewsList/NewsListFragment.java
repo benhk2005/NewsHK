@@ -29,6 +29,8 @@ import com.benleungcreative.newshk.Helpers.OfflineNewsHelper;
 import com.benleungcreative.newshk.NewsDetail.NewsDetailActivity;
 import com.benleungcreative.newshk.R;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
@@ -145,6 +147,7 @@ public class NewsListFragment extends Fragment {
             APIHelper.getInstance().getNewsList(this, newsCategory.toAPIKey(), new MyRequest.MyRequestCallback() {
                 @Override
                 public void onSuccess(JSONObject jsonObject) throws IOException {
+                    newsItemArrayList.clear();
                     JSONArray articlesJSONArray = jsonObject.optJSONArray("articles");
                     if (articlesJSONArray == null) {
                         throw new IOException("articles not found");
@@ -239,41 +242,44 @@ public class NewsListFragment extends Fragment {
 
         public void applyData(NewsItem newsItem) {
             newsItemContainer.setTag(R.id.newsItem, newsItem);
-            if(newsCategory == NewsCategory.OFFLINE_NEWS){
-                Glide.with(itemView.getContext()).load(new File(getContext().getFilesDir(), "images/"+newsItem.toSHA1Hash()+".jpg")).into(newsItemImageView);
-            }else {
-                if (newsItem.imageUrl != null) {
-                    Glide.with(newsItemImageView)
-                            .load(newsItem.imageUrl)
-                            .apply(new RequestOptions().placeholder(R.drawable.splash_screen_background_drawable))
-                            .into(new SimpleTarget<Drawable>() {
-
-                                @Override
-                                public void onLoadStarted(@Nullable Drawable placeholder) {
-                                    super.onLoadStarted(placeholder);
-                                    newsItemImageView.setImageDrawable(placeholder);
-                                    newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                                }
-
-                                @Override
-                                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                    newsItemImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                                    newsItemImageView.setImageDrawable(resource);
-                                }
-
-
-                                @Override
-                                public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                                    super.onLoadFailed(errorDrawable);
-                                    newsItemImageView.setImageDrawable(errorDrawable);
-                                    newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                                }
-                            });
+            if (newsItem.imageUrl != null || newsCategory == NewsCategory.OFFLINE_NEWS) {
+                RequestManager requestManager = Glide.with(newsItemImageView);
+                RequestBuilder<Drawable> requestBuilder;
+                if (newsCategory == NewsCategory.OFFLINE_NEWS) {
+                    requestBuilder = requestManager.load(new File(getContext().getFilesDir(), "images/" + newsItem.toSHA1Hash() + ".jpg"));
                 } else {
-                    newsItemImageView.setImageResource(R.drawable.splash_screen_background_drawable);
-                    newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                    requestBuilder = requestManager.load(newsItem.imageUrl);
                 }
+
+                requestBuilder.apply(new RequestOptions().placeholder(R.drawable.splash_screen_background_drawable))
+                        .into(new SimpleTarget<Drawable>() {
+
+                            @Override
+                            public void onLoadStarted(@Nullable Drawable placeholder) {
+                                super.onLoadStarted(placeholder);
+                                newsItemImageView.setImageDrawable(placeholder);
+                                newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                            }
+
+                            @Override
+                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                                newsItemImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                newsItemImageView.setImageDrawable(resource);
+                            }
+
+
+                            @Override
+                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                super.onLoadFailed(errorDrawable);
+                                newsItemImageView.setImageDrawable(errorDrawable);
+                                newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                            }
+                        });
+            } else {
+                newsItemImageView.setImageResource(R.drawable.splash_screen_background_drawable);
+                newsItemImageView.setScaleType(ImageView.ScaleType.FIT_XY);
             }
+
             if (newsItem.title == null) {
                 newsTitleTextView.setVisibility(View.GONE);
             } else {
