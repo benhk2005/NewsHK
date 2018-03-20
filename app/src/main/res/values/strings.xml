@@ -18,6 +18,9 @@
     <string name="downloaded_news">已下載新聞</string>
     <string name="download_for_offline">下載作離線時觀看</string>
     <string name="news_has_been_downloaded">新聞已下載</string>
+    <string name="no_downloaded_news">未有任何下載新聞</string>
+    <string name="please_press">請按 </string>
+    <string name="to_download_news"> 來下載新聞作離線瀏覽</string>
 
     <string name="press_again_to_exit">再按一次「返回」退出</string>
 

@@ -56,6 +56,7 @@ public class OfflineNewsHelper {
                     imagesFolder.mkdirs();
                     File imgFile = new File(imagesFolder, newsHash + ".jpg");
                     try {
+                        imgFile.createNewFile();
                         FileOutputStream fos = new FileOutputStream(imgFile);
                         resource.compress(Bitmap.CompressFormat.JPEG, 80, fos);
                         fos.close();

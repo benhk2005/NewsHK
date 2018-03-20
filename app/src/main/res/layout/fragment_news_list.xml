@@ -5,31 +5,31 @@
     tools:context="com.benleungcreative.newshk.NewsList.NewsListFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/newsListPullToRefreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/newsListPullToRefreshLayout">
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
+            android:id="@+id/newsListRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/newsListRecyclerView"/>
+            android:layout_height="match_parent" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout
+        android:id="@+id/unableToFetchNewsContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#fff"
         android:clickable="true"
-        android:orientation="vertical"
         android:gravity="center"
-        android:id="@+id/unableToFetchNewsContainer">
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#000"
-            android:text="@string/unable_to_fetch_news"/>
+            android:text="@string/unable_to_fetch_news"
+            android:textColor="#000" />
 
         <Button
             android:id="@+id/newsListRetryButton"
@@ -39,6 +39,51 @@
             android:layout_marginRight="50dp"
             android:layout_marginTop="10dp"
             android:text="@string/retry" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/emptyOfflineNewsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fff"
+        android:clickable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_downloaded_news"
+            android:textColor="#000" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/please_press"
+                android:textColor="#000" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:src="@drawable/ic_action_cloud_download" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/to_download_news"
+                android:textColor="#000" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

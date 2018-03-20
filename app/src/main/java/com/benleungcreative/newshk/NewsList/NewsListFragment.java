@@ -53,6 +53,7 @@ public class NewsListFragment extends Fragment {
 
     private RecyclerView newsListRecyclerView;
     private View unableToFetchNewsContainer;
+    private View emptyOfflineNewsContainer;
     private NewsCategory newsCategory;
     private ArrayList<NewsItem> newsItemArrayList;
     private SwipeRefreshLayout newsListPullToRefreshLayout;
@@ -100,6 +101,7 @@ public class NewsListFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         unableToFetchNewsContainer = view.findViewById(R.id.unableToFetchNewsContainer);
+        emptyOfflineNewsContainer = view.findViewById(R.id.emptyOfflineNewsContainer);
         newsListPullToRefreshLayout = view.findViewById(R.id.newsListPullToRefreshLayout);
         newsListRetryButton = view.findViewById(R.id.newsListRetryButton);
         newsListPullToRefreshLayout.setColorSchemeColors(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null));
@@ -133,9 +135,29 @@ public class NewsListFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && newsCategory == NewsCategory.OFFLINE_NEWS) {
+            getOfflineNews();
+            updateRecyclerView();
+        }
+    }
+
     private void getOfflineNews() {
         hideNetworkErrorUI();
         newsItemArrayList = OfflineNewsHelper.readOfflineNews(getContext());
+        if (newsItemArrayList.size() == 0) {
+            showEmptyOfflineNewsUI();
+        } else {
+            hideEmptyOfflineNewsUI();
+        }
         newsListPullToRefreshLayout.setRefreshing(false);
         updateRecyclerView();
     }
@@ -202,7 +224,24 @@ public class NewsListFragment extends Fragment {
         unableToFetchNewsContainer.setVisibility(View.GONE);
     }
 
+    private void showEmptyOfflineNewsUI() {
+        emptyOfflineNewsContainer.setVisibility(View.VISIBLE);
+    }
+
+    private void hideEmptyOfflineNewsUI() {
+        emptyOfflineNewsContainer.setVisibility(View.GONE);
+    }
+
     private class NewsListAdapter extends RecyclerView.Adapter<NewsItemViewHolder> {
+
+        public NewsListAdapter() {
+            setHasStableIds(true);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return newsItemArrayList.get(position).toSHA1Hash().hashCode();
+        }
 
         @Override
         public NewsItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
