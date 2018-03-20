@@ -138,15 +138,8 @@ public class NewsListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && newsCategory == NewsCategory.OFFLINE_NEWS) {
+        if(newsCategory == NewsCategory.OFFLINE_NEWS) {
             getOfflineNews();
-            updateRecyclerView();
         }
     }
 
