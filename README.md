@@ -5,7 +5,8 @@ News HK Provide Top News, Finance, Entertainment, Health, Science, Sports and Te
 # Download
 
 You may download the app from Google Play.
-[![Get it from Google Play](https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png | width=150)](https://play.google.com/store/apps/details?id=com.benleungcreative.newshk)]
+
+<a href="https://play.google.com/store/apps/details?id=com.benleungcreative.newshk"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" style="width:150px" /></a>
 
 or Download from release section
 
